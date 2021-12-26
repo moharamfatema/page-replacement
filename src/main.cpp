@@ -17,19 +17,9 @@ public:
         const unsigned int noofFrames,
         const std::string algo,
         const std::vector<unsigned int> sequence)
-    {
-        init(noofFrames,algo,sequence);
-    }
-
-    void init(
-        const unsigned int noofFrames,
-        const std::string algo,
-        const std::vector<unsigned int> sequence)
-    {
-        this->noofFrames = noofFrames;
-        this->algo = algo;
-        this-> sequence=sequence ;
-    }
+        :noofFrames(noofFrames),
+        algo(algo),
+        sequence(sequence){}
     
     void optimal();
     std::vector<std::deque<unsigned int>> fifo()
@@ -66,10 +56,16 @@ public:
     void lru();
     void clock();
     void output();
+    /*getters*/
     std::string getAlgo() { return algo; }
     std::vector<unsigned int> getSequence() { return sequence; }
     const unsigned int getNoofFrames() { return noofFrames; }
     std::deque<unsigned int> getFrames() { return frames; }
     std::vector<std::deque<unsigned int>> getTrace() { return trace; }
     std::vector<bool> getPageFaults(){return pageFaults;}
+    
+    /*setters*/
+    void setNoofFrames(const unsigned int a){ this->noofFrames = a;}
+    void setAlgo(std::string a){ this->algo = a;}
+    void setSequence(std::vector<unsigned int> a){ this->sequence = a;}
 };
