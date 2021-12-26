@@ -1,6 +1,5 @@
 #include <vector>
 #include <string>
-#include <deque>
 #include <algorithm>
 
 class PageReplacement
@@ -8,8 +7,8 @@ class PageReplacement
     unsigned int noofFrames;
     std::string algo;
     std::vector<unsigned int> sequence;
-    std::deque<unsigned int> frames;
-    std::vector<std::deque<unsigned int>> trace;
+    std::vector<unsigned int> frames;
+    std::vector<std::vector<unsigned int>> trace;
     std::vector<bool> pageFaults;
 
 public:
@@ -19,10 +18,10 @@ public:
         const std::vector<unsigned int> sequence)
         :noofFrames(noofFrames),
         algo(algo),
-        sequence(sequence){}
+        sequence(sequence){ frames.reserve(noofFrames);}
     
     void optimal();
-    std::vector<std::deque<unsigned int>> fifo()
+    std::vector<std::vector<unsigned int>> fifo()
     {
         auto it = frames.begin();
         for (int i = 0; i < sequence.size(); i++)
@@ -44,8 +43,8 @@ public:
                 /*page fault*/
                 pageFaults.push_back(true);
                 *it = sequence[i];
-                it++;
-                if(it == frames.end()) it = frames.begin();
+                if(it+1 == frames.end()) it = frames.begin();
+                else it++;
 
             }
             /*record frames in trace*/
@@ -60,8 +59,8 @@ public:
     std::string getAlgo() { return algo; }
     std::vector<unsigned int> getSequence() { return sequence; }
     const unsigned int getNoofFrames() { return noofFrames; }
-    std::deque<unsigned int> getFrames() { return frames; }
-    std::vector<std::deque<unsigned int>> getTrace() { return trace; }
+    std::vector<unsigned int> getFrames() { return frames; }
+    std::vector<std::vector<unsigned int>> getTrace() { return trace; }
     std::vector<bool> getPageFaults(){return pageFaults;}
     
     /*setters*/

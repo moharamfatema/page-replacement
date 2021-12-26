@@ -17,7 +17,7 @@ TEST(TestPageReplacement, testConstructor)
 TEST(TestPageReplacement, testFIFO)
 {
     PageReplacement paging(3, "FIFO", {5, 12, 5, 2, 4, 2, 5});
-    std::vector<std::deque<unsigned int>> correctTrace = {
+    std::vector<std::vector<unsigned int>> correctTrace = {
         {5},
         {5, 12},
         {5, 12},
