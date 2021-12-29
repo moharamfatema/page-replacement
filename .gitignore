@@ -1,3 +1,6 @@
 CMakeLists.txt
 .vscode
 build
+*.out
+main
+*.txt
