@@ -269,25 +269,29 @@ public:
 class InputOutput
 {
 public:
-    static PageReplacement inputAndLaunch()
+    static PageReplacement  inputAndLaunch()
     {
-        
+
         int noFrames;
         std::string algo;
         std::vector<int> sequence;
+        sequence.resize(0);
 
         std::cin >> noFrames;
         std::cin >> algo;
 
-        int in;
-        std::cin >> in;
-        while (in >= 0)
+        int in ;
+        std::string str;
+        std::cin >> str;
+        while (str != "-1")
         {
+            in = stoi(str);
             sequence.push_back(in);
-            std::cin >> in;
+            str = "";
+            std::cin >> str;
+    
         }
         PageReplacement paging(noFrames, algo, sequence);
-        paging.go();
         return paging;
     }
 
@@ -335,9 +339,9 @@ public:
 
 int main()
 {
-
     PageReplacement paging = InputOutput::inputAndLaunch();
-    //PageReplacement paging(3, "FIFO", {5, 12, 5, 2, 4, 2, 5});
+
+    //PageReplacement paging(3, "FIFO", {2,3,2,1,5,2,4,5,3,2,5,2});
     paging.go();
     InputOutput::output(paging);
 }
