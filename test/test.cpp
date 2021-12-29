@@ -25,7 +25,8 @@ TEST(TestPageReplacement, testFIFO)
         {4, 12, 2},
         {4, 12, 2},
         {4, 5, 2}};
-    EXPECT_THAT(paging.go(), ContainerEq(correctTrace));
+        paging.go();
+    EXPECT_THAT(paging.getTrace(), ContainerEq(correctTrace));
     EXPECT_THAT(
         paging.getPageFaults(),
         ElementsAre(
@@ -157,4 +158,63 @@ TEST(TestPageReplacement,testClock)
             true,
             false));
     EXPECT_EQ(5,paging.getNoOfPageFaults());
+}
+
+TEST(TestPageReplacement,testLestRecentlyUsed)
+{
+    PageReplacement paging(3, "LRU", {2,3,2,1,5,2,4,5,3,2,5,2});
+    std::vector<  int> mockFrames = {2,3,1};
+
+    int index = 4;
+    paging.setFrames(mockFrames);
+    EXPECT_EQ(3,*paging.leastRecentlyUsed(index));
+    mockFrames[1] = 5;
+    index+=2;
+    paging.setFrames(mockFrames);
+    EXPECT_EQ(1,*paging.leastRecentlyUsed(index));
+    mockFrames[2] = 4;
+    index +=2;
+    paging.setFrames(mockFrames);
+    EXPECT_EQ(2,*paging.leastRecentlyUsed(index));
+    mockFrames[0] = 3;
+    index++;
+    paging.setFrames(mockFrames);
+    EXPECT_EQ(4,*paging.leastRecentlyUsed(index));
+}
+
+TEST(TestPageReplacement,testLRU)
+{
+    PageReplacement paging(3, "LRU", {2,3,2,1,5,2,4,5,3,2,5,2});
+    std::vector<std::vector<  int>> correctTrace = {
+        {2},
+        {2, 3},
+        {2, 3},
+        {2, 3, 1},
+        {2, 5, 1},
+        {2, 5, 1},
+        {2, 5, 4},
+        {2, 5, 4},
+        {3, 5, 4},
+        {3, 5, 2},
+        {3, 5, 2},
+        {3, 5, 2},
+    };
+    
+    EXPECT_THAT(paging.go(),ContainerEq(correctTrace));
+    EXPECT_THAT(
+        paging.getPageFaults(),
+        ElementsAre(
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            true,
+            false,
+            false));
+    EXPECT_EQ(4,paging.getNoOfPageFaults());
 }

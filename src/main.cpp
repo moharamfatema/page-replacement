@@ -2,9 +2,12 @@
 #include <string>
 #include <algorithm>
 #include <bits/stdc++.h>
+#include <iostream>
+
 
 typedef std::vector<int>::iterator iterator;
 typedef std::vector<std::vector<int>> Trace;
+
 class PageReplacement
 {
     int noofFrames;
@@ -61,6 +64,20 @@ public:
     }
 
     /*to place in private after development*/
+    iterator leastRecentlyUsed(int i)
+    {
+        std::priority_queue<std::pair<int, iterator>> q;
+        auto framesit = frames.begin();
+        std::reverse_iterator<iterator> found;
+        int index;
+        for (framesit = frames.begin(); framesit < frames.end(); framesit++)
+        {
+            found = std::find(sequence.rend() - i - 1, sequence.rend(), *framesit);
+            index = found - sequence.rend() + i + 1;
+            q.push(std::make_pair(index, framesit));
+        }
+        return q.top().second;
+    }
 
     iterator predict(iterator it)
     {
@@ -80,6 +97,7 @@ public:
         }
         return q.top().second;
     }
+
     Trace optimal()
     {
         noOfPageFaults = 0;
@@ -97,6 +115,7 @@ public:
         }
         return trace;
     }
+
     Trace fifo()
     {
         auto it = frames.begin();
@@ -122,12 +141,28 @@ public:
 
     Trace lru()
     {
+        noOfPageFaults = 0;
+        int index;
+        for (auto i = sequence.begin(); i < sequence.end(); i++)
+        {
+            if (pageFault(i))
+            {
+                /*page fault*/
+                pageFaults.push_back(true);
+                noOfPageFaults++;
+                index = i - sequence.begin();
+                *leastRecentlyUsed(index) = *i;
+            }
+            /*record frames in trace*/
+            trace.push_back(frames);
+        }
         return trace;
     }
+
     Trace clock()
     {
         std::vector<bool> arr;
-        
+
         for (int j = 0; j < noofFrames; j++)
         {
             arr.push_back(false); // no stars
@@ -146,34 +181,33 @@ public:
                 index = framesit - frames.begin();
                 arr[index] = true; // star
                 pageFaults.push_back(false);
-                
             }
             else if (frames.size() < noofFrames)
             {
                 /*frames not full yet*/
                 frames.push_back(*i);
-                index = frames.size() -1;
+                index = frames.size() - 1;
                 arr[index] = true;
-                it = (it+1 - frames.begin() == noofFrames)?frames.begin(): it + 1;
+                it = (it + 1 - frames.begin() == noofFrames) ? frames.begin() : it + 1;
                 pageFaults.push_back(false);
-            }else
+            }
+            else
             {
                 /*page fault*/
-                
+
                 pageFaults.push_back(true);
                 noOfPageFaults++;
                 index = it - frames.begin();
-                while(arr[index]) //has a star
+                while (arr[index]) // has a star
                 {
                     arr[index] = false;
-                    it = (it+1 == frames.end())?frames.begin(): it + 1;
+                    it = (it + 1 == frames.end()) ? frames.begin() : it + 1;
                     index = it - frames.begin();
                 }
                 /*no star*/
                 *it = *i;
-                arr[index] = true; //star
-                it = (it + 1 == frames.end())?frames.begin(): it + 1;
-
+                arr[index] = true; // star
+                it = (it + 1 == frames.end()) ? frames.begin() : it + 1;
             }
 
             /*record frames in trace*/
@@ -182,8 +216,6 @@ public:
         return trace;
     }
 
-    /*this stays public*/
-    void output();
 
     /*getters for testing purposes*/
     std::string getAlgo()
@@ -233,4 +265,32 @@ public:
     {
         this->frames = a;
     }
+};
+
+class InputOutput
+{
+    public:
+    PageReplacement inputAndLaunch()
+    {
+        int noFrames;
+        std::string algo;
+        std::vector<int> sequence;
+
+        std::cin >> noFrames;
+        std::cin >> algo;
+        
+        int in;
+        std::cin >> in;
+        while(in > -1)
+        {
+            sequence.push_back(in);
+            std::cin >> in;
+        }
+        PageReplacement paging(noFrames,algo,sequence);
+        paging.go();
+        return paging;
+    }
+
+    void output()
+    {}
 };
