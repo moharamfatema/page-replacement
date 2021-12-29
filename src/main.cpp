@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <bits/stdc++.h>
 #include <iostream>
-
+#include <cctype>
 
 typedef std::vector<int>::iterator iterator;
 typedef std::vector<std::vector<int>> Trace;
@@ -216,7 +216,6 @@ public:
         return trace;
     }
 
-
     /*getters for testing purposes*/
     std::string getAlgo()
     {
@@ -269,24 +268,25 @@ public:
 
 class InputOutput
 {
-    public:
+public:
     static PageReplacement inputAndLaunch()
     {
+        
         int noFrames;
         std::string algo;
         std::vector<int> sequence;
 
         std::cin >> noFrames;
         std::cin >> algo;
-        
+
         int in;
         std::cin >> in;
-        while(in > -1)
+        while (in >= 0)
         {
             sequence.push_back(in);
             std::cin >> in;
         }
-        PageReplacement paging(noFrames,algo,sequence);
+        PageReplacement paging(noFrames, algo, sequence);
         paging.go();
         return paging;
     }
@@ -294,33 +294,50 @@ class InputOutput
     static void output(PageReplacement paging)
     {
         std::cout << "Replacement Policy = " << paging.getAlgo() << "\n-------------------------------------\n";
-        std::cout << "Page \tContent of Frames\n";
-        std::cout << "---- \t-----------------\n";
+        std::cout << "Page   Content of Frames\n";
+        std::cout << "----   -----------------\n";
         int page;
-        for(int it = 0; it < paging.getTrace().size(); it++)
+        Trace trace = paging.getTrace();
+        std::vector<int> frame;
+
+        for (int it = 0; it < trace.size(); it++)
         {
             page = paging.getSequence()[it];
 
-            std::cout << (page<10)? ("0"+std::to_string(page)) : std::to_string(page);
-            if( paging.getPageFaults()[it]) std::cout << "F";
-            
-            std::cout << " \t";
-            
-            for(auto j = paging.getTrace()[it].begin(); j < paging.getTrace()[it].end(); j++)
+            if (page < 10)
             {
-                std::cout << (*j<10)? ("0"+std::to_string(*j)) : std::to_string(*j);
-                if(j < paging.getTrace()[it].end() -1)std::cout << " ";
+                std::cout << "0";
             }
-            
+            std::cout << page;
+            if (paging.getPageFaults()[it])
+                std::cout << " F";
+            else
+                std::cout << "  ";
+            std::cout << "   ";
+            frame = trace[it];
+            for (auto j = frame.begin(); j < frame.end(); j++)
+            {
+                if (*j < 10)
+                {
+                    std::cout << "0";
+                }
+                std::cout << *j;
+
+                std::cout << " ";
+            }
+
             std::cout << "\n";
         }
-        std::cout << "\n-------------------------------------\n";
+        std::cout << "-------------------------------------\n";
         std::cout << "Number of page faults = " << paging.getNoOfPageFaults() << "\n";
     }
 };
 
 int main()
 {
+
     PageReplacement paging = InputOutput::inputAndLaunch();
+    //PageReplacement paging(3, "FIFO", {5, 12, 5, 2, 4, 2, 5});
+    paging.go();
     InputOutput::output(paging);
 }
