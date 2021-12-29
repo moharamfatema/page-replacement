@@ -18,7 +18,7 @@ class PageReplacement
     bool pageFault(iterator it)
     {
         /*search for page in frames*/
-        if (std::find(frames.begin(), frames.end(), *it) != frames.end())
+        if (*std::find(frames.begin(), frames.end(), *it) == *it)
         {
             /*page found*/
             pageFaults.push_back(false);
@@ -34,7 +34,7 @@ class PageReplacement
         else
             return true;
     }
-    
+
 public:
     PageReplacement(
         const int noofFrames,
@@ -126,27 +126,56 @@ public:
     }
     Trace clock()
     {
-        std::vector<std::pair<bool,iterator>> arr;
-        arr.resize(noofFrames);
-        for(auto j = arr.begin(); j < arr.end(); j++)
+        std::vector<bool> arr;
+        
+        for (int j = 0; j < noofFrames; j++)
         {
-            j->first = 0; //no stars
+            arr.push_back(false); // no stars
         }
+
         auto it = frames.begin();
         noOfPageFaults = 0;
+        iterator framesit;
+        int index;
         for (auto i = sequence.begin(); i < sequence.end(); i++)
         {
-            if (pageFault(i))
+            framesit = std::find(frames.begin(), frames.end(), *i);
+            if (*framesit == *i)
+            {
+                /*page found*/
+                index = framesit - frames.begin();
+                arr[index] = true; // star
+                pageFaults.push_back(false);
+                
+            }
+            else if (frames.size() < noofFrames)
+            {
+                /*frames not full yet*/
+                frames.push_back(*i);
+                index = frames.size() -1;
+                arr[index] = true;
+                it = (it+1 - frames.begin() == noofFrames)?frames.begin(): it + 1;
+                pageFaults.push_back(false);
+            }else
             {
                 /*page fault*/
+                
                 pageFaults.push_back(true);
                 noOfPageFaults++;
+                index = it - frames.begin();
+                while(arr[index]) //has a star
+                {
+                    arr[index] = false;
+                    it = (it+1 == frames.end())?frames.begin(): it + 1;
+                    index = it - frames.begin();
+                }
+                /*no star*/
                 *it = *i;
-                if (it + 1 == frames.end())
-                    it = frames.begin();
-                else
-                    it++;
+                arr[index] = true; //star
+                it = (it + 1 == frames.end())?frames.begin(): it + 1;
+
             }
+
             /*record frames in trace*/
             trace.push_back(frames);
         }

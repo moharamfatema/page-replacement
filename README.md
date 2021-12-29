@@ -18,23 +18,4 @@ Predict(frames,sequence,it)
 
 ```
 
-## Pseudo code for clock  
 
-```C++
-
-clock()
-    let arr = new vector<pair<accessed,frame itr>>
-    where all accessed values = 0 //no star
-    let it = arr.begin
-    foundOrPlaced, it = find a page(page);
-    if foundOrPlaced:
-        find it in arr and set corresponding accessed = 1 //star
-    else //page fault
-        while( *it.accessed = 1 //star)
-            *it.accessed = 0 //remove star
-            it++ //move forward
-        replace *it.itr
-        set *it.accessed = 1 //star
-        it++
-
-```

@@ -122,3 +122,39 @@ TEST(TestPageReplacement,testPredict)
     EXPECT_EQ(*paging.predict(it+3),4);
 }
 
+TEST(TestPageReplacement,testClock)
+{
+    PageReplacement paging(3, "CLOCK", {2,3,2,1,5,2,4,5,3,2,5,2});
+    std::vector<std::vector<  int>> correctTrace = {
+        {2},
+        {2, 3},
+        {2, 3},
+        {2, 3, 1},
+        {5, 3, 1},
+        {5, 2, 1},
+        {5, 2, 4},
+        {5, 2, 4},
+        {3, 2, 4},
+        {3, 2, 4},
+        {3, 2, 5},
+        {3, 2, 5},
+    };
+    
+    EXPECT_THAT(paging.go(),ContainerEq(correctTrace));
+    EXPECT_THAT(
+        paging.getPageFaults(),
+        ElementsAre(
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false));
+    EXPECT_EQ(5,paging.getNoOfPageFaults());
+}
