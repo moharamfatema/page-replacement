@@ -17,7 +17,7 @@ TEST(TestPageReplacement, testConstructor)
 TEST(TestPageReplacement, testFIFO)
 {
     PageReplacement paging(3, "FIFO", {5, 12, 5, 2, 4, 2, 5});
-    std::vector<std::vector<unsigned int>> correctTrace = {
+    std::vector<std::vector<  int>> correctTrace = {
         {5},
         {5, 12},
         {5, 12},
@@ -25,7 +25,7 @@ TEST(TestPageReplacement, testFIFO)
         {4, 12, 2},
         {4, 12, 2},
         {4, 5, 2}};
-    EXPECT_THAT(paging.fifo(), ContainerEq(correctTrace));
+    EXPECT_THAT(paging.go(), ContainerEq(correctTrace));
     EXPECT_THAT(
         paging.getPageFaults(),
         ElementsAre(
@@ -36,6 +36,7 @@ TEST(TestPageReplacement, testFIFO)
             true,
             false,
             true));
+    EXPECT_EQ(paging.getNoOfPageFaults(),2);
     PageReplacement paging2(3, "FIFO", {2, 3, 2, 1, 5, 2, 4, 5, 3, 2, 5, 2});
     correctTrace = {
         {2},
@@ -50,7 +51,7 @@ TEST(TestPageReplacement, testFIFO)
         {3, 2, 4},
         {3, 5, 4},
         {3, 5, 2}};
-    EXPECT_THAT(paging2.fifo(), ContainerEq(correctTrace));
+    EXPECT_THAT(paging2.go(), ContainerEq(correctTrace));
     EXPECT_THAT(
         paging2.getPageFaults(),
         ElementsAre(
@@ -66,4 +67,58 @@ TEST(TestPageReplacement, testFIFO)
             false,
             true,
             true));
+    
+    EXPECT_EQ(paging2.getNoOfPageFaults(),6);
 }
+
+TEST(TestPageReplacement,testOptimal)
+{
+    PageReplacement paging(3, "OPTIMAL", {2,3,2,1,5,2,4,5,3,2,5,2});
+    std::vector<std::vector<  int>> correctTrace = {
+        {2},
+        {2, 3},
+        {2, 3},
+        {2, 3, 1},
+        {2, 3, 5},
+        {2, 3, 5},
+        {4, 3, 5},
+        {4, 3, 5},
+        {4, 3, 5},
+        {2,3,5},
+        {2,3,5},
+        {2,3,5}
+    };
+    EXPECT_THAT(paging.go(), ContainerEq(correctTrace));
+    EXPECT_THAT(
+        paging.getPageFaults(),
+        ElementsAre(
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+            true,
+            false,
+            false));
+    EXPECT_EQ(paging.getNoOfPageFaults(),3);
+}
+
+TEST(TestPageReplacement,testPredict)
+{
+    PageReplacement paging(3, "OPTIMAL", {2,3,2,1,5,2,4,5,3,2,5,2});
+    std::vector<  int> mockFrames = {2,3,1};
+    auto it = paging.getSequence().begin() + 4;
+    paging.setFrames(mockFrames);
+    EXPECT_EQ(*paging.predict(it),1);
+    mockFrames[2] = 5;
+    paging.setFrames(mockFrames);
+    EXPECT_EQ(*paging.predict(it+2),2);
+    mockFrames[0] = 4;
+    paging.setFrames(mockFrames);
+    EXPECT_EQ(*paging.predict(it+3),4);
+}
+
