@@ -270,7 +270,7 @@ public:
 class InputOutput
 {
     public:
-    PageReplacement inputAndLaunch()
+    static PageReplacement inputAndLaunch()
     {
         int noFrames;
         std::string algo;
@@ -291,6 +291,36 @@ class InputOutput
         return paging;
     }
 
-    void output()
-    {}
+    static void output(PageReplacement paging)
+    {
+        std::cout << "Replacement Policy = " << paging.getAlgo() << "\n-------------------------------------\n";
+        std::cout << "Page \tContent of Frames\n";
+        std::cout << "---- \t-----------------\n";
+        int page;
+        for(int it = 0; it < paging.getTrace().size(); it++)
+        {
+            page = paging.getSequence()[it];
+
+            std::cout << (page<10)? ("0"+std::to_string(page)) : std::to_string(page);
+            if( paging.getPageFaults()[it]) std::cout << "F";
+            
+            std::cout << " \t";
+            
+            for(auto j = paging.getTrace()[it].begin(); j < paging.getTrace()[it].end(); j++)
+            {
+                std::cout << (*j<10)? ("0"+std::to_string(*j)) : std::to_string(*j);
+                if(j < paging.getTrace()[it].end() -1)std::cout << " ";
+            }
+            
+            std::cout << "\n";
+        }
+        std::cout << "\n-------------------------------------\n";
+        std::cout << "Number of page faults = " << paging.getNoOfPageFaults() << "\n";
+    }
 };
+
+int main()
+{
+    PageReplacement paging = InputOutput::inputAndLaunch();
+    InputOutput::output(paging);
+}
