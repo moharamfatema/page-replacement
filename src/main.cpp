@@ -38,32 +38,7 @@ class PageReplacement
             return true;
     }
 
-public:
-    PageReplacement(
-        const int noofFrames,
-        const std::string algo,
-        const std::vector<int> sequence)
-        : noofFrames(noofFrames),
-          algo(algo),
-          sequence(sequence)
-    {
-        frames.reserve(noofFrames);
-        noOfPageFaults = 0;
-    }
-
-    std::vector<std::vector<int>> go()
-    {
-        if (algo == "FIFO")
-            return fifo();
-        else if (algo == "CLOCK")
-            return clock();
-        else if (algo == "LRU")
-            return lru();
-        else
-            return optimal();
-    }
-
-    /*to place in private after development*/
+   /*to place in private after development*/
     iterator leastRecentlyUsed(int i)
     {
         std::priority_queue<std::pair<int, iterator>> q;
@@ -216,7 +191,33 @@ public:
         return trace;
     }
 
-    /*getters for testing purposes*/
+public:
+    PageReplacement(
+        const int noofFrames,
+        const std::string algo,
+        const std::vector<int> sequence)
+        : noofFrames(noofFrames),
+          algo(algo),
+          sequence(sequence)
+    {
+        frames.reserve(noofFrames);
+        noOfPageFaults = 0;
+    }
+
+    std::vector<std::vector<int>> go()
+    {
+        if (algo == "FIFO")
+            return fifo();
+        else if (algo == "CLOCK")
+            return clock();
+        else if (algo == "LRU")
+            return lru();
+        else
+            return optimal();
+    }
+
+ 
+    /*getters*/
     std::string getAlgo()
     {
         return algo;
@@ -246,24 +247,7 @@ public:
         return noOfPageFaults;
     }
 
-    /*setters for testing purposes*/
-    void setNoofFrames(int a)
-    {
-        this->noofFrames = a;
-    }
-    void setAlgo(std::string a)
-    {
-        this->algo = a;
-    }
-    void setSequence(std::vector<int> a)
-    {
-        this->sequence = a;
-    }
-    /*for testing*/
-    void setFrames(std::vector<int> a)
-    {
-        this->frames = a;
-    }
+
 };
 
 class InputOutput

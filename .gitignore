@@ -4,3 +4,4 @@ build
 */*.out
 */main
 *.txt
+io
